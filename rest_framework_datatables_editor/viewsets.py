@@ -85,7 +85,15 @@ class EditorModelMixin(object):
 
 
         return JsonResponse({'data': return_data})
+    
+    def perform_create(self, serializer):
+        serializer.save()
 
+    def perform_update(self, serializer):
+        serializer.save()
+
+    def perform_destory(self, instance):
+        instance.delete()
 
 class DatatablesEditorModelViewSet(EditorModelMixin, ModelViewSet):
     pass
