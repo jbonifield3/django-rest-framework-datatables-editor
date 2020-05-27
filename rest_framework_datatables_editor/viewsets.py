@@ -62,7 +62,8 @@ class EditorModelMixin(object):
                     )
                     if not serializer.is_valid():  # pragma: no cover
                         raise ValidationError(serializer.errors)
-                    serializer.save()
+                    # serializer.save() replace with perform_create() to allow customization
+                    perform_create(self, serializer)
                     return_data.append(serializer.data)
                     continue
 
@@ -75,11 +76,13 @@ class EditorModelMixin(object):
                     )
                     if not serializer.is_valid():  # pragma: no cover
                         raise ValidationError(serializer.errors)
-                    # serializer.save() replace with perform_create() to allow customization
-                        perform_create(self, serializer)
+                    # serializer.save() replace with perform_update() to allow customization
+                        perform_update(self, serializer)
                     return_data.append(serializer.data)
                 elif act == 'remove':
-                    elem.delete()
+#                     elem.delete() replace with perform_destory() to allow customization
+                    perform_destory(self, elem)
+
 
         return JsonResponse({'data': return_data})
 
