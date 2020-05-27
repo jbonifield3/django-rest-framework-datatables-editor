@@ -25,8 +25,8 @@ def check_fields(serializer, data):
 class EditorModelMixin(object):
 
     @staticmethod
-    def get_post_date(post):
-        def read_date(data_in, data_out, rest_of_line):
+    def get_post_data(post):
+        def read_data(data_in, data_out, rest_of_line):
             field_name = data_in[0]
             if not isinstance(data_out.get(field_name), dict):
                 new_data_point = {}
@@ -42,14 +42,14 @@ class EditorModelMixin(object):
         for (line, value) in post.items():
             if line.startswith('data'):
                 line_data = re.findall(r"\[([^\[\]]*)\]", line)
-                read_date(line_data, data, value)
+                read_data(line_data, data, value)
         return data
 
     @action(detail=False, url_name='editor', methods=['post'])
     def editor(self, request):
         post = request.POST
         act = post['action']
-        data = self.get_post_date(post)
+        data = self.get_post_data(post)
 
         return_data = []
         if act == 'edit' or act == 'remove' or act == 'create':
@@ -75,7 +75,8 @@ class EditorModelMixin(object):
                     )
                     if not serializer.is_valid():  # pragma: no cover
                         raise ValidationError(serializer.errors)
-                    serializer.save()
+                    # serializer.save() replace with perform_create() to allow customization
+                        perform_create(self, serializer)
                     return_data.append(serializer.data)
                 elif act == 'remove':
                     elem.delete()
